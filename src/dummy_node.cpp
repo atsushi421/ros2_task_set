@@ -1,98 +1,117 @@
-#include <chrono>
-#include <memory>
-#include <sys/syscall.h>
-
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
+#include "static_callback_isolated_executor.hpp"
+#include "yaml-cpp/yaml.h"
+
 #include "std_msgs/msg/int32.hpp"
 
-#include "static_callback_isolated_executor.hpp"
+#include <sys/syscall.h>
+
+#include <chrono>
+#include <memory>
 
 using namespace std::chrono_literals;
 
 const long long MESSAGE_SIZE = 1024;
+const std::string DAG_FILE_PATH = "dag.yaml";
 
-class DummyNode : public rclcpp::Node {
+class DummyNode : public rclcpp::Node
+{
 public:
-  explicit DummyNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions())
-      : Node("sample_node", "/sample_space/sample_subspace", options),
-        count_(0), count2_(0) {
-    publisher_ = this->create_publisher<std_msgs::msg::Int32>("topic_out", 1);
-    publisher2_ = this->create_publisher<std_msgs::msg::Int32>("topic_out2", 1);
+  explicit DummyNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  : Node("sample_node", "/sample_space/sample_subspace", options)
+  {
+    YAML::Node dag = YAML::LoadFile(DAG_FILE_PATH);
+    num_increments_in_1ms_ = count_increment_in_1ms();
 
-    group1_ =
-        create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    group2_ =
-        create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    group3_ =
-        create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    for (const auto & cb : dag["callbacks"]) {
+      auto publisher =
+        this->create_publisher<std_msgs::msg::Int32>("topic_" + cb["id"].as<std::string>(), 10);
+      publishers_.push_back(publisher);
+      auto group = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+      groups_.push_back(group);
 
-    timer_ = this->create_wall_timer(
-        3000ms, std::bind(&DummyNode::timer_callback, this), group1_);
-    timer2_ = this->create_wall_timer(
-        1333ms, std::bind(&DummyNode::timer_callback2, this), group2_);
+      if (cb["period_ms"]) {
+        // timer
+        auto timer = this->create_wall_timer(
+          std::chrono::milliseconds(cb["period_ms"].as<int>()),
+          [this, cb]() {
+            auto message = std_msgs::msg::Int32();
+            message.data = 0;
+            dummy_work(cb["execution_time_ms"].as<int>());
+            publishers_[cb["id"].as<int>()]->publish(std::move(message));
+          },
+          group);
+        timers_.push_back(timer);
+      }
 
-    rclcpp::SubscriptionOptions sub_options;
-    sub_options.callback_group = group3_;
-
-    subscription_ = this->create_subscription<std_msgs::msg::Int32>(
-        "topic_in", 1,
-        std::bind(&DummyNode::subscription_callback, this,
-                  std::placeholders::_1),
-        sub_options);
+      else {
+        // subscription
+        rclcpp::SubscriptionOptions sub_options;
+        sub_options.callback_group = group;
+        auto subscription = this->create_subscription<std_msgs::msg::Int32>(
+          "topic_" + get_sub_topic_id(dag["communications"], cb["id"].as<int>()), 1,
+          [this, cb](const std_msgs::msg::Int32::SharedPtr msg [[maybe_unused]]) {
+            auto message = std_msgs::msg::Int32();
+            message.data = 0;
+            dummy_work(cb["execution_time_ms"].as<int>());
+            publishers_[cb["id"].as<int>()]->publish(std::move(message));
+          },
+          sub_options);
+        subscriptions_.push_back(subscription);
+      }
+    }
   }
 
 private:
-  void timer_callback() {
-    long tid = syscall(SYS_gettid);
-    auto message = std_msgs::msg::Int32();
-    message.data = count_++;
-    RCLCPP_INFO(this->get_logger(),
-                "Publishing Message ID (timer_callback tid=%ld): '%d'", tid,
-                message.data);
-    publisher_->publish(std::move(message));
+  long long count_increment_in_1ms()
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    int count = 0;
+    while (
+      std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - start)
+        .count() < 1.0) {
+      ++count;
+    }
+
+    return count;
   }
 
-  void timer_callback2() {
-    long tid = syscall(SYS_gettid);
-    auto message = std_msgs::msg::Int32();
-    message.data = count2_++;
-    RCLCPP_INFO(this->get_logger(),
-                "Publishing Message ID (timer_callback2 tid=%ld): '%d'", tid,
-                message.data);
-    publisher2_->publish(std::move(message));
+  std::string get_sub_topic_id(const YAML::Node & comms, int sub_cb_id)
+  {
+    for (const auto & comm : comms) {
+      if (comm["to"].as<int>() == sub_cb_id) {
+        return comm["from"].as<std::string>();
+      }
+    }
+    return "";
   }
 
-  void subscription_callback(const std_msgs::msg::Int32::SharedPtr msg) const {
-    long tid = syscall(SYS_gettid);
-    RCLCPP_INFO(this->get_logger(),
-                "I heard message ID (subscription_callback tid=%ld): '%d'", tid,
-                msg->data);
+  void dummy_work(int execution_time_ms)
+  {
+    long needed_increments = num_increments_in_1ms_ * execution_time_ms;
+    long count = 0;
+    for (long i = 0; i < needed_increments; ++i) {
+      ++count;
+    }
   }
 
-  rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::TimerBase::SharedPtr timer2_;
-  rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr publisher_;
-  rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr publisher2_;
-  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription_;
+  std::vector<rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr> publishers_;
+  std::vector<rclcpp::TimerBase::SharedPtr> timers_;
+  std::vector<rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr> subscriptions_;
+  std::vector<rclcpp::CallbackGroup::SharedPtr> groups_;
 
-  // Need to be stored not to be destructed
-  rclcpp::CallbackGroup::SharedPtr group1_;
-  rclcpp::CallbackGroup::SharedPtr group2_;
-  rclcpp::CallbackGroup::SharedPtr group3_;
-
-  size_t count_;
-  size_t count2_;
+  long long num_increments_in_1ms_;
 };
 
 RCLCPP_COMPONENTS_REGISTER_NODE(DummyNode)
 
-int main(int argc, char *argv[]) {
+int main(int argc, char * argv[])
+{
   rclcpp::init(argc, argv);
 
   auto node = std::make_shared<DummyNode>();
   auto executor = std::make_shared<StaticCallbackIsolatedExecutor>();
-
   executor->add_node(node);
   executor->spin();
 
