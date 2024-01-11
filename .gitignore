@@ -36,3 +36,5 @@ build/
 install/
 log/
 .clang-*
+caret.log
+caret_trace_data/
