@@ -3,7 +3,7 @@
 #include "static_callback_isolated_executor.hpp"
 #include "yaml-cpp/yaml.h"
 
-#include "std_msgs/msg/int32.hpp"
+#include "std_msgs/msg/string.hpp"
 
 #include <sys/syscall.h>
 
@@ -26,7 +26,7 @@ public:
 
     for (const auto & cb : dag["callbacks"]) {
       auto publisher =
-        this->create_publisher<std_msgs::msg::Int32>("topic_" + cb["id"].as<std::string>(), 10);
+        this->create_publisher<std_msgs::msg::String>("topic_" + cb["id"].as<std::string>(), 10);
       publishers_.push_back(publisher);
       auto group = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
       groups_.push_back(group);
@@ -36,8 +36,8 @@ public:
         auto timer = this->create_wall_timer(
           std::chrono::milliseconds(cb["period_ms"].as<int>()),
           [this, cb]() {
-            auto message = std_msgs::msg::Int32();
-            message.data = 0;
+            auto message = std_msgs::msg::String();
+            message.data = "Hello from timer-callback" + std::to_string(cb["id"].as<int>());
             dummy_work(cb["execution_time_ms"].as<int>());
             publishers_[cb["id"].as<int>()]->publish(std::move(message));
           },
@@ -49,11 +49,11 @@ public:
         // subscription
         rclcpp::SubscriptionOptions sub_options;
         sub_options.callback_group = group;
-        auto subscription = this->create_subscription<std_msgs::msg::Int32>(
+        auto subscription = this->create_subscription<std_msgs::msg::String>(
           "topic_" + get_sub_topic_id(dag["communications"], cb["id"].as<int>()), 1,
-          [this, cb](const std_msgs::msg::Int32::SharedPtr msg [[maybe_unused]]) {
-            auto message = std_msgs::msg::Int32();
-            message.data = 0;
+          [this, cb](const std_msgs::msg::String::SharedPtr msg [[maybe_unused]]) {
+            auto message = std_msgs::msg::String();
+            message.data = "Hello from subscription-callback" + std::to_string(cb["id"].as<int>());
             dummy_work(cb["execution_time_ms"].as<int>());
             publishers_[cb["id"].as<int>()]->publish(std::move(message));
           },
@@ -96,9 +96,9 @@ private:
     }
   }
 
-  std::vector<rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr> publishers_;
+  std::vector<rclcpp::Publisher<std_msgs::msg::String>::SharedPtr> publishers_;
   std::vector<rclcpp::TimerBase::SharedPtr> timers_;
-  std::vector<rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr> subscriptions_;
+  std::vector<rclcpp::Subscription<std_msgs::msg::String>::SharedPtr> subscriptions_;
   std::vector<rclcpp::CallbackGroup::SharedPtr> groups_;
 
   long long num_increments_in_1ms_;
