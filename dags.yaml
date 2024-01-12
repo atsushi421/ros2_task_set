@@ -1,0 +1,30 @@
+callbacks:
+  # DAG0
+  - id: 0
+    execution_time_ms: 100
+    period_ms: 200
+  - id: 1
+    execution_time_ms: 50
+  - id: 2
+    execution_time_ms: 30
+
+  # DAG1
+  - id: 3
+    execution_time_ms: 20
+    period_ms: 100
+
+  # DAG2
+  - id: 4
+    execution_time_ms: 100
+    period_ms: 1000
+
+  # DAG3
+  - id: 5
+    execution_time_ms: 30
+    period_ms: 100
+
+communications:
+  - from: 0
+    to: 1
+  - from: 1
+    to: 2

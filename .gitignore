@@ -38,3 +38,4 @@ log/
 .clang-*
 caret.log
 caret_trace_data/
+exec_time_logs/
