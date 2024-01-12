@@ -44,7 +44,7 @@ communications:
 ```
 
 > [!WARNING]
-> Complex trigger semantics such as Sync of multiple messages are not yet supported.
+> Complex trigger semantics such as multiple message synchronisation are not yet supported.
 
 2. Refer to [this document](https://tier4.atlassian.net/wiki/spaces/~5ed0b4584824b20c18371c06/pages/2886861884/CallbackGroup#step3%3A-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E9%9B%9B%E5%BD%A2%E3%82%92%E4%BD%9C%E6%88%90%E3%83%BB%E7%B7%A8%E9%9B%86) to set each thread's scheduling policy and affinity (TIER IV INTERNAL).
 3. Performance can be measured and visualized using tools such as [CARET](https://tier4.github.io/caret_doc/latest/). If you just want to draw a simple callback scheduling chart, `evaluate.ipynb` offers this.
