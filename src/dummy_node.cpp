@@ -5,6 +5,7 @@
 
 #include "std_msgs/msg/string.hpp"
 
+#include <pthread.h>
 #include <sys/syscall.h>
 
 #include <chrono>
@@ -35,7 +36,7 @@ public:
     for (const auto & cb : dag["callbacks"]) {
       auto file = std::make_shared<std::ofstream>(
         EXEC_TIME_LOGS_DIR + "/callback" + cb["id"].as<std::string>() + ".csv");
-      *file << "start_time_ms,execution_time_ms" << std::endl;
+      *file << "scheduling_policy,start_time_ms,execution_time_us" << std::endl;
       files_.push_back(file);
       publishers_.emplace_back(
         this->create_publisher<std_msgs::msg::String>("topic_" + cb["id"].as<std::string>(), 10));
@@ -109,8 +110,31 @@ private:
 
   void write_exec_time(int cb_id, _V2::system_clock::time_point start)
   {
-    *files_[cb_id] << duration_cast<milliseconds>(start.time_since_epoch()).count() << ","
-                   << duration_cast<milliseconds>(high_resolution_clock::now() - start).count()
+    int self_policy;
+    sched_param self_param;
+    pthread_getschedparam(pthread_self(), &self_policy, &self_param);
+    std::string scheduling_policy;
+    switch (self_policy) {
+      case SCHED_OTHER:
+        scheduling_policy = "SCHED_OTHER";
+        break;
+      case SCHED_FIFO:
+        scheduling_policy = "SCHED_FIFO";
+        break;
+      case SCHED_RR:
+        scheduling_policy = "SCHED_RR";
+        break;
+      case SCHED_DEADLINE:
+        scheduling_policy = "SCHED_DEADLINE";
+        break;
+      default:
+        scheduling_policy = "UNKNOWN";
+        break;
+    }
+
+    *files_[cb_id] << scheduling_policy << ","
+                   << duration_cast<microseconds>(start.time_since_epoch()).count() << ","
+                   << duration_cast<microseconds>(high_resolution_clock::now() - start).count()
                    << std::endl;
   }
 
