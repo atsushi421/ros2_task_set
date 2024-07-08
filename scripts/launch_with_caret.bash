@@ -1,6 +1,7 @@
 #!/bin/bash
 
-ulimit -n 16384
+ulimit -n 65535
+ulimit -c unlimited
 source /home/atsushi/ros2_caret_ws/setenv_caret.bash
 source /home/atsushi/ros2_thread_configurator/install/local_setup.bash
 source /home/atsushi/component_container_callback_isolated/install/local_setup.bash
