@@ -86,7 +86,7 @@ private:
       ++count;
     }
 
-    const int ADJUST_FACTOR = 13;  // FIXME
+    const int ADJUST_FACTOR = 12;  // FIXME
     return count * ADJUST_FACTOR;
   }
 
