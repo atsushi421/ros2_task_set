@@ -82,11 +82,11 @@ private:
   {
     auto start = high_resolution_clock::now();
     volatile unsigned long long count = 0;
-    while (duration<double, std::nano>(high_resolution_clock::now() - start).count() < 1e6) {
+    while (duration<double, std::nano>(high_resolution_clock::now() - start).count() < 987000) {
       ++count;
     }
 
-    const int ADJUST_FACTOR = 12;  // FIXME
+    const int ADJUST_FACTOR = 13;  // FIXME
     return count * ADJUST_FACTOR;
   }
 

@@ -1,30 +1,28 @@
 callbacks:
-  # DAG0
+  # Task0
   - id: 0
-    execution_time_ms: 100
-    period_ms: 200
+    execution_time_ms: 5
+    period_ms: 100
+
+  # Task1
   - id: 1
-    execution_time_ms: 50
+    execution_time_ms: 4
+    period_ms: 80
+
+  # Task2
   - id: 2
-    execution_time_ms: 30
+    execution_time_ms: 2
+    period_ms: 40
 
-  # DAG1
+  # Task3
   - id: 3
-    execution_time_ms: 20
-    period_ms: 100
-
-  # DAG2
+    execution_time_ms: 17
+    period_ms: 20
+  
+  # Task4
   - id: 4
-    execution_time_ms: 100
-    period_ms: 1000
-
-  # DAG3
-  - id: 5
-    execution_time_ms: 30
-    period_ms: 100
+    execution_time_ms: 10
+    period_ms: 200
 
 communications:
-  - from: 0
-    to: 1
-  - from: 1
-    to: 2
+  
