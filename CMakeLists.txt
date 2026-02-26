@@ -11,7 +11,7 @@ find_package(ament_cmake_auto REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(rclcpp_component_container_callback_isolated REQUIRED)
+find_package(agnocastlib REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 if(BUILD_TESTING)
@@ -20,7 +20,7 @@ if(BUILD_TESTING)
 endif()
 
 ament_auto_add_library(dummy_node SHARED src/dummy_node.cpp)
-ament_target_dependencies(dummy_node rclcpp rclcpp_components std_msgs rclcpp_component_container_callback_isolated)
+ament_target_dependencies(dummy_node rclcpp rclcpp_components std_msgs agnocastlib)
 target_link_libraries(dummy_node yaml-cpp)
 rclcpp_components_register_nodes(dummy_node "DummyNode")
 

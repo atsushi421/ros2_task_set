@@ -4,7 +4,17 @@
 
 1. Follow [the steps on this page](https://tier4.atlassian.net/wiki/spaces/~5ed0b4584824b20c18371c06/pages/2886861884/CallbackGroup#step1%3A-%E3%81%9D%E3%82%8C%E3%81%9E%E3%82%8C%E3%83%93%E3%83%AB%E3%83%89%26%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB) to install dependent libraries (TIER IV INTERNAL).
 2. `cd ros2_task_set`
-3. `colcon build`
+3. `git submodule update --init --recursive`
+4. `colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release --base-paths . agnocast/src --packages-up-to ros2_task_set agnocast_components`
+
+## Run
+
+Place `dags.yaml` (see [Usage](#usage)) in the current directory, then:
+
+```bash
+source install/setup.bash
+ros2 launch ros2_task_set dummy_node.launch.xml
+```
 
 ## Usage
 

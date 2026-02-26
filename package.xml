@@ -15,7 +15,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>std_msgs</depend>
-  <depend>rclcpp_component_container_callback_isolated</depend>
+  <depend>agnocastlib</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
