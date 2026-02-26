@@ -58,8 +58,13 @@ int64_t time_to_us(const builtin_interfaces::msg::Time & t)
 
 class DummyNode : public rclcpp::Node
 {
-  using ExactPolicy2 = message_filters::sync_policies::ExactTime<HeaderMsg, HeaderMsg>;
+  using H = HeaderMsg;
+  using ExactPolicy2 = message_filters::sync_policies::ExactTime<H, H>;
+  using ExactPolicy3 = message_filters::sync_policies::ExactTime<H, H, H>;
+  using ExactPolicy4 = message_filters::sync_policies::ExactTime<H, H, H, H>;
   using Sync2 = message_filters::Synchronizer<ExactPolicy2>;
+  using Sync3 = message_filters::Synchronizer<ExactPolicy3>;
+  using Sync4 = message_filters::Synchronizer<ExactPolicy4>;
 
 public:
   explicit DummyNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
@@ -121,74 +126,97 @@ public:
         int cb_id = cb["id"].as<int>();
         const auto & sources = incoming_edges[cb_id];
 
+        // Common callback logic for subscription-triggered callbacks
+        auto sync_callback = [this, cb](int64_t chain_start_us) {
+          int cb_id = cb["id"].as<int>();
+          auto start = high_resolution_clock::now();
+          write_start(cb_id, start);
+          dummy_work(cb["execution_time_ms"].as<unsigned long long>());
+          publish(cb_id, chain_start_us);
+          auto finish = high_resolution_clock::now();
+          write_finish(cb_id, start, finish);
+          if (deadline_ms_.count(cb_id)) {
+            int64_t finish_us =
+              duration_cast<microseconds>(finish.time_since_epoch()).count();
+            response_times_[cb_id].push_back(finish_us - chain_start_us);
+          }
+        };
+
         if (sources.size() == 1) {
           // Single incoming edge: normal subscription
           rclcpp::SubscriptionOptions sub_options;
           sub_options.callback_group = group;
           subscriptions_.emplace_back(this->create_subscription<HeaderMsg>(
             "topic_" + std::to_string(sources[0]), 1,
-            [this, cb](const HeaderMsg::SharedPtr msg) {
-              int cb_id = cb["id"].as<int>();
-              int64_t chain_start_us = time_to_us(msg->stamp);
-              auto start = high_resolution_clock::now();
-              write_start(cb_id, start);
-              dummy_work(cb["execution_time_ms"].as<unsigned long long>());
-              publish(cb_id, chain_start_us);
-              auto finish = high_resolution_clock::now();
-              write_finish(cb_id, start, finish);
-              if (deadline_ms_.count(cb_id)) {
-                int64_t finish_us =
-                  duration_cast<microseconds>(finish.time_since_epoch()).count();
-                response_times_[cb_id].push_back(finish_us - chain_start_us);
-              }
+            [sync_callback](const HeaderMsg::SharedPtr msg) {
+              sync_callback(time_to_us(msg->stamp));
             },
             sub_options));
-        } else if (sources.size() == 2) {
-          // Two incoming edges: use message_filters Synchronizer with ExactTime
-          rclcpp::SubscriptionOptions sub_options0;
-          sub_options0.callback_group = group;
-          auto group1 =
-            this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-          groups_.push_back(group1);
-          rclcpp::SubscriptionOptions sub_options1;
-          sub_options1.callback_group = group1;
-
-          auto mf_sub0 = std::make_shared<message_filters::Subscriber<HeaderMsg>>(
-            this, "topic_" + std::to_string(sources[0]), rmw_qos_profile_default, sub_options0);
-          auto mf_sub1 = std::make_shared<message_filters::Subscriber<HeaderMsg>>(
-            this, "topic_" + std::to_string(sources[1]), rmw_qos_profile_default, sub_options1);
-
-          auto sync = std::make_shared<Sync2>(ExactPolicy2(10), *mf_sub0, *mf_sub1);
-
-          auto callback_fn = [this, cb](HeaderMsg::ConstSharedPtr msg0, HeaderMsg::ConstSharedPtr) {
-            int cb_id = cb["id"].as<int>();
-            int64_t chain_start_us = time_to_us(msg0->stamp);
-            auto start = high_resolution_clock::now();
-            write_start(cb_id, start);
-            dummy_work(cb["execution_time_ms"].as<unsigned long long>());
-            publish(cb_id, chain_start_us);
-            auto finish = high_resolution_clock::now();
-            write_finish(cb_id, start, finish);
-            if (deadline_ms_.count(cb_id)) {
-              int64_t finish_us =
-                duration_cast<microseconds>(finish.time_since_epoch()).count();
-              response_times_[cb_id].push_back(finish_us - chain_start_us);
+        } else if (sources.size() >= 2 && sources.size() <= 4) {
+          // Multiple incoming edges: use message_filters Synchronizer with ExactTime
+          // Create a subscriber with its own callback group for each source
+          std::vector<std::shared_ptr<message_filters::Subscriber<HeaderMsg>>> subs;
+          auto make_sub = [&](size_t i) {
+            rclcpp::CallbackGroup::SharedPtr grp;
+            if (i == 0) {
+              grp = group;
+            } else {
+              grp = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+              groups_.push_back(grp);
             }
+            rclcpp::SubscriptionOptions opts;
+            opts.callback_group = grp;
+            auto sub = std::make_shared<message_filters::Subscriber<HeaderMsg>>(
+              this, "topic_" + std::to_string(sources[i]), rmw_qos_profile_default, opts);
+            subs.push_back(sub);
+            mf_subscribers_.push_back(sub);
           };
+          for (size_t i = 0; i < sources.size(); ++i) {
+            make_sub(i);
+          }
 
           using NullP = const std::shared_ptr<message_filters::NullType const> &;
           using HdrP = const HeaderMsg::ConstSharedPtr &;
-          std::function<void(HdrP, HdrP, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>
-            wrapped_cb = std::bind(
-              callback_fn, std::placeholders::_1, std::placeholders::_2);
-          sync->registerCallback(wrapped_cb);
 
-          mf_subscribers_.push_back(mf_sub0);
-          mf_subscribers_.push_back(mf_sub1);
-          synchronizers_.push_back(sync);
+          if (sources.size() == 2) {
+            auto sync = std::make_shared<Sync2>(ExactPolicy2(10), *subs[0], *subs[1]);
+            std::function<void(HdrP, HdrP, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>
+              wrapped = std::bind(
+                [sync_callback](HeaderMsg::ConstSharedPtr msg0, HeaderMsg::ConstSharedPtr) {
+                  sync_callback(time_to_us(msg0->stamp));
+                },
+                std::placeholders::_1, std::placeholders::_2);
+            sync->registerCallback(wrapped);
+            synchronizers_2_.push_back(sync);
+          } else if (sources.size() == 3) {
+            auto sync =
+              std::make_shared<Sync3>(ExactPolicy3(10), *subs[0], *subs[1], *subs[2]);
+            std::function<void(HdrP, HdrP, HdrP, NullP, NullP, NullP, NullP, NullP, NullP)>
+              wrapped = std::bind(
+                [sync_callback](
+                  HeaderMsg::ConstSharedPtr msg0, HeaderMsg::ConstSharedPtr,
+                  HeaderMsg::ConstSharedPtr) { sync_callback(time_to_us(msg0->stamp)); },
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            sync->registerCallback(wrapped);
+            synchronizers_3_.push_back(sync);
+          } else {
+            auto sync = std::make_shared<Sync4>(
+              ExactPolicy4(10), *subs[0], *subs[1], *subs[2], *subs[3]);
+            std::function<void(HdrP, HdrP, HdrP, HdrP, NullP, NullP, NullP, NullP, NullP)>
+              wrapped = std::bind(
+                [sync_callback](
+                  HeaderMsg::ConstSharedPtr msg0, HeaderMsg::ConstSharedPtr,
+                  HeaderMsg::ConstSharedPtr, HeaderMsg::ConstSharedPtr) {
+                  sync_callback(time_to_us(msg0->stamp));
+                },
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+                std::placeholders::_4);
+            sync->registerCallback(wrapped);
+            synchronizers_4_.push_back(sync);
+          }
         } else {
           RCLCPP_ERROR(
-            this->get_logger(), "Callback %d has %zu incoming edges (only 1 or 2 supported)",
+            this->get_logger(), "Callback %d has %zu incoming edges (only 1-4 supported)",
             cb_id, sources.size());
           rclcpp::shutdown();
         }
@@ -337,7 +365,9 @@ private:
   std::vector<std::shared_ptr<std::ofstream>> files_;
 
   std::vector<std::shared_ptr<message_filters::Subscriber<HeaderMsg>>> mf_subscribers_;
-  std::vector<std::shared_ptr<Sync2>> synchronizers_;
+  std::vector<std::shared_ptr<Sync2>> synchronizers_2_;
+  std::vector<std::shared_ptr<Sync3>> synchronizers_3_;
+  std::vector<std::shared_ptr<Sync4>> synchronizers_4_;
 
   unsigned long long num_increments_in_1ms_;
   std::map<int, int> deadline_ms_;
