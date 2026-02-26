@@ -16,181 +16,217 @@ callback_groups:
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_0)
+  - id: /dummy_node@Subscription(/dummy_cbg_0)@Timer(100000000)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_1)
+  - id: /dummy_node@Subscription(/dummy_cbg_1)@Subscription(/topic_0)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_11)
+  - id: /dummy_node@Subscription(/dummy_cbg_10)@Subscription(/topic_4)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_12)
+  - id: /dummy_node@Subscription(/dummy_cbg_10_1)@Subscription(/topic_8)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_13)
+  - id: /dummy_node@Subscription(/dummy_cbg_10_2)@Subscription(/topic_9)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_14)
+  - id: /dummy_node@Subscription(/dummy_cbg_11)@Timer(100000000)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_15)
+  - id: /dummy_node@Subscription(/dummy_cbg_12)@Subscription(/topic_11)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_17)
+  - id: /dummy_node@Subscription(/dummy_cbg_13)@Subscription(/topic_12)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_18)
+  - id: /dummy_node@Subscription(/dummy_cbg_14)@Subscription(/topic_13)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_19)
+  - id: /dummy_node@Subscription(/dummy_cbg_15)@Subscription(/topic_14)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_2)
+  - id: /dummy_node@Subscription(/dummy_cbg_16)@Subscription(/topic_15)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_20)
+  - id: /dummy_node@Subscription(/dummy_cbg_16_1)@Subscription(/topic_20)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_21)
+  - id: /dummy_node@Subscription(/dummy_cbg_17)@Subscription(/topic_12)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_22)
+  - id: /dummy_node@Subscription(/dummy_cbg_18)@Subscription(/topic_17)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_23)
+  - id: /dummy_node@Subscription(/dummy_cbg_19)@Subscription(/topic_18)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_24)
+  - id: /dummy_node@Subscription(/dummy_cbg_2)@Subscription(/topic_1)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_25)
+  - id: /dummy_node@Subscription(/dummy_cbg_20)@Subscription(/topic_19)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_27)
+  - id: /dummy_node@Subscription(/dummy_cbg_21)@Timer(100000000)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_28)
+  - id: /dummy_node@Subscription(/dummy_cbg_22)@Subscription(/topic_21)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_29)
+  - id: /dummy_node@Subscription(/dummy_cbg_23)@Subscription(/topic_22)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_3)
+  - id: /dummy_node@Subscription(/dummy_cbg_24)@Subscription(/topic_23)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_30)
+  - id: /dummy_node@Subscription(/dummy_cbg_25)@Subscription(/topic_24)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_31)
+  - id: /dummy_node@Subscription(/dummy_cbg_26)@Subscription(/topic_25)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_4)
+  - id: /dummy_node@Subscription(/dummy_cbg_26_1)@Subscription(/topic_31)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_5)
+  - id: /dummy_node@Subscription(/dummy_cbg_27)@Subscription(/topic_21)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_6)
+  - id: /dummy_node@Subscription(/dummy_cbg_28)@Subscription(/topic_27)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_7)
+  - id: /dummy_node@Subscription(/dummy_cbg_29)@Subscription(/topic_28)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_8)
+  - id: /dummy_node@Subscription(/dummy_cbg_3)@Subscription(/topic_2)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Subscription(/topic_9)
+  - id: /dummy_node@Subscription(/dummy_cbg_30)@Subscription(/topic_29)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
     priority: 0
 
-  - id: /dummy_node@Timer(100000000)
+  - id: /dummy_node@Subscription(/dummy_cbg_31)@Subscription(/topic_30)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/dummy_cbg_4)@Subscription(/topic_3)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/dummy_cbg_5)@Subscription(/topic_0)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/dummy_cbg_6)@Subscription(/topic_5)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/dummy_cbg_7)@Subscription(/topic_6)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/dummy_cbg_8)@Subscription(/topic_7)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/dummy_cbg_9)@Subscription(/topic_2)
     domain_id: 0
     affinity: ~
     policy: SCHED_OTHER
