@@ -36,6 +36,16 @@ for tu_dir in "${DAG_SET_DIR}"/TU_*; do
 		# Clean up old exec_time_logs
 		rm -rf "${SCRIPT_DIR}/exec_time_logs"
 
+		# Start thread configurator with corresponding CIE config
+		cie_yaml="${tu_dir}/cie_${case_name}.yaml"
+		configurator_pid=""
+		if [[ -f "${cie_yaml}" ]]; then
+			ros2 run agnocast_cie_thread_configurator thread_configurator_node --config-file "${cie_yaml}" &
+			configurator_pid=$!
+		else
+			echo "  [WARN] CIE config not found: ${cie_yaml}" | tee -a "${RESULT_FILE}"
+		fi
+
 		# Run the launch file in a new process group, capturing all output
 		output_file="$(mktemp)"
 		setsid ros2 launch ${LAUNCH_FILE} >"${output_file}" 2>&1 &
@@ -53,6 +63,12 @@ for tu_dir in "${DAG_SET_DIR}"/TU_*; do
 			kill -9 -- "-${launch_pid}" 2>/dev/null || true
 		}
 		wait "${launch_pid}" 2>/dev/null || true
+
+		# Stop thread configurator
+		if [[ -n "${configurator_pid}" ]]; then
+			kill "${configurator_pid}" 2>/dev/null || true
+			wait "${configurator_pid}" 2>/dev/null || true
+		fi
 
 		# Extract and record Response Time Statistics
 		if grep -q "Response Time Statistics" "${output_file}"; then
