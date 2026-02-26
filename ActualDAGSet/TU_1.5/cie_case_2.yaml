@@ -1,0 +1,122 @@
+hardware_info:
+  cpu_family: 6
+  cpu_max_mhz: 2101.0000
+  cpu_min_mhz: 800.0000
+  frequency_boost: enabled
+  model: 85
+  model_name: Intel(R) Xeon(R) Silver 4216 CPU @ 2.10GHz
+  threads_per_core: 1
+rt_throttling:
+  runtime_us: 950000
+  period_us: 1000000
+callback_groups:
+  - id: /dummy_node@Service(/dummy_node/describe_parameters)@Service(/dummy_node/get_parameter_types)@Service(/dummy_node/get_parameters)@Service(/dummy_node/list_parameters)@Service(/dummy_node/set_parameters)@Service(/dummy_node/set_parameters_atomically)@Subscription(/parameter_events)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_0)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_1)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_11)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_13)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_14)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_15)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_16)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_18)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_2)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_3)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_4)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_5)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_6)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_7)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_8)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/topic_9)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Timer(100000000)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+non_ros_threads:
+  []
