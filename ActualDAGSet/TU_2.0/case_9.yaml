@@ -1,0 +1,130 @@
+callbacks:
+  # DAG0
+  - id: 0
+    execution_time_ms: 2
+    period_ms: 100
+  - id: 1
+    execution_time_ms: 1
+  - id: 2
+    execution_time_ms: 1
+  - id: 3
+    execution_time_ms: 13
+  - id: 4
+    execution_time_ms: 20
+  - id: 5
+    execution_time_ms: 4
+  - id: 6
+    execution_time_ms: 1
+  - id: 7
+    execution_time_ms: 2
+  - id: 8
+    execution_time_ms: 25
+  - id: 9
+    execution_time_ms: 11
+  - id: 10
+    execution_time_ms: 20
+    deadline_ms: 85
+
+  # DAG1
+  - id: 11
+    execution_time_ms: 2
+    period_ms: 100
+  - id: 12
+    execution_time_ms: 3
+  - id: 13
+    execution_time_ms: 9
+  - id: 14
+    execution_time_ms: 15
+  - id: 15
+    execution_time_ms: 4
+  - id: 16
+    execution_time_ms: 1
+    deadline_ms: 51
+  - id: 17
+    execution_time_ms: 1
+  - id: 18
+    execution_time_ms: 1
+  - id: 19
+    execution_time_ms: 1
+  - id: 20
+    execution_time_ms: 9
+  - id: 21
+    execution_time_ms: 4
+
+  # DAG2
+  - id: 22
+    execution_time_ms: 41
+    period_ms: 100
+  - id: 23
+    execution_time_ms: 4
+  - id: 24
+    execution_time_ms: 1
+  - id: 25
+    execution_time_ms: 1
+    deadline_ms: 65
+  - id: 26
+    execution_time_ms: 1
+  - id: 27
+    execution_time_ms: 2
+
+communications:
+  - from: 0
+    to: 1
+  - from: 0
+    to: 5
+  - from: 1
+    to: 2
+  - from: 2
+    to: 3
+  - from: 2
+    to: 9
+  - from: 3
+    to: 4
+  - from: 4
+    to: 10
+  - from: 5
+    to: 6
+  - from: 6
+    to: 7
+  - from: 7
+    to: 8
+  - from: 8
+    to: 10
+  - from: 9
+    to: 10
+  - from: 11
+    to: 12
+  - from: 11
+    to: 17
+  - from: 12
+    to: 13
+  - from: 13
+    to: 14
+  - from: 14
+    to: 15
+  - from: 15
+    to: 16
+  - from: 17
+    to: 18
+  - from: 18
+    to: 19
+  - from: 19
+    to: 20
+  - from: 20
+    to: 21
+  - from: 21
+    to: 16
+  - from: 22
+    to: 23
+  - from: 22
+    to: 26
+  - from: 23
+    to: 24
+  - from: 23
+    to: 25
+  - from: 24
+    to: 25
+  - from: 26
+    to: 27
+  - from: 27
+    to: 25
