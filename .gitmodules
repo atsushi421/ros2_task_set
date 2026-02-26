@@ -1,0 +1,3 @@
+[submodule "agnocast"]
+	path = agnocast
+	url = https://github.com/autowarefoundation/agnocast.git
