@@ -122,6 +122,7 @@ public:
             }
           },
           group));
+        add_cbg_marker(group, cb["id"].as<std::string>());
       } else {
         int cb_id = cb["id"].as<int>();
         const auto & sources = incoming_edges[cb_id];
@@ -152,6 +153,7 @@ public:
               sync_callback(time_to_us(msg->stamp));
             },
             sub_options));
+          add_cbg_marker(group, std::to_string(cb_id));
         } else if (sources.size() >= 2 && sources.size() <= 4) {
           // Multiple incoming edges: use message_filters Synchronizer with ExactTime
           // Create a subscriber with its own callback group for each source
@@ -170,6 +172,9 @@ public:
               this, "topic_" + std::to_string(sources[i]), rmw_qos_profile_default, opts);
             subs.push_back(sub);
             mf_subscribers_.push_back(sub);
+            std::string marker_id =
+              (i == 0) ? std::to_string(cb_id) : std::to_string(cb_id) + "_" + std::to_string(i);
+            add_cbg_marker(grp, marker_id);
           };
           for (size_t i = 0; i < sources.size(); ++i) {
             make_sub(i);
@@ -227,6 +232,17 @@ public:
   ~DummyNode() override { print_response_time_statistics(); }
 
 private:
+  // Add a no-op subscription to make the callback group ID unique in CIE config.
+  // Without this, callback groups containing only a Timer with the same period, or only a
+  // Subscription to the same topic, would produce duplicate IDs.
+  void add_cbg_marker(const rclcpp::CallbackGroup::SharedPtr & group, const std::string & marker_id)
+  {
+    rclcpp::SubscriptionOptions opts;
+    opts.callback_group = group;
+    subscriptions_.emplace_back(this->create_subscription<HeaderMsg>(
+      "dummy_cbg_" + marker_id, 1, [](const HeaderMsg::SharedPtr) {}, opts));
+  }
+
   unsigned long long count_increment_in_1ms()
   {
     auto start = high_resolution_clock::now();
