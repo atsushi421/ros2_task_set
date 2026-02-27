@@ -12,7 +12,7 @@ set -eo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "${SCRIPT_DIR}")"
-DAG_SET_DIR="${PROJECT_DIR}/ActualDAGSet"
+DAG_SET_DIR="${DAG_SET_DIR:-${PROJECT_DIR}/ActualDAGSet}"
 LAUNCH_FILE="ros2_task_set dummy_node.launch.xml"
 WAIT_BEFORE_LAUNCH=2
 WAIT_FOR_DISCOVERY=5

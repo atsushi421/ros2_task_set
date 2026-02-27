@@ -1,0 +1,276 @@
+hardware_info:
+  cpu_family: 6
+  cpu_max_mhz: 2101.0000
+  cpu_min_mhz: 800.0000
+  frequency_boost: enabled
+  model: 85
+  model_name: Intel(R) Xeon(R) Silver 4216 CPU @ 2.10GHz
+  threads_per_core: 1
+rt_throttling:
+  runtime_us: 950000
+  period_us: 1000000
+callback_groups:
+  - id: /dummy_node@Service(/dummy_node/describe_parameters)@Service(/dummy_node/get_parameter_types)@Service(/dummy_node/get_parameters)@Service(/dummy_node/list_parameters)@Service(/dummy_node/set_parameters)@Service(/dummy_node/set_parameters_atomically)@Subscription(/parameter_events)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_OTHER
+    priority: 0
+
+  - id: /dummy_node@Subscription(/dummy_cbg_0)@Timer(100000000)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 2000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_1)@Subscription(/topic_0)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 1000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_10)@Subscription(/topic_4)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 20000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_10_1)@Subscription(/topic_8)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 20000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_10_2)@Subscription(/topic_9)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 20000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_11)@Timer(100000000)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 2000000
+    period: 100000000
+    deadline: 101000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_12)@Subscription(/topic_11)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 67000000
+    period: 100000000
+    deadline: 101000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_13)@Subscription(/topic_12)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 3000000
+    period: 100000000
+    deadline: 101000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_14)@Subscription(/topic_11)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 22000000
+    period: 100000000
+    deadline: 101000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_15)@Subscription(/topic_13)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 6000000
+    period: 100000000
+    deadline: 101000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_15_1)@Subscription(/topic_14)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 6000000
+    period: 100000000
+    deadline: 101000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_16)@Timer(100000000)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 4000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_17)@Subscription(/topic_16)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 2000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_18)@Subscription(/topic_17)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 6000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_19)@Subscription(/topic_18)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 24000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_2)@Subscription(/topic_1)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 1000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_20)@Subscription(/topic_19)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 4000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_21)@Subscription(/topic_16)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 3000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_22)@Subscription(/topic_21)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 1000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_23)@Subscription(/topic_22)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 1000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_24)@Subscription(/topic_23)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 2000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_25)@Subscription(/topic_18)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 1000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_26)@Subscription(/topic_20)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 2000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_26_1)@Subscription(/topic_24)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 2000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_26_2)@Subscription(/topic_25)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 2000000
+    period: 100000000
+    deadline: 63000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_3)@Subscription(/topic_2)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 13000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_4)@Subscription(/topic_3)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 20000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_5)@Subscription(/topic_0)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 4000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_6)@Subscription(/topic_5)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 1000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_7)@Subscription(/topic_6)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 2000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_8)@Subscription(/topic_7)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 25000000
+    period: 100000000
+    deadline: 85000000
+
+  - id: /dummy_node@Subscription(/dummy_cbg_9)@Subscription(/topic_2)
+    domain_id: 0
+    affinity: ~
+    policy: SCHED_DEADLINE
+    runtime: 11000000
+    period: 100000000
+    deadline: 85000000
+
+non_ros_threads:
+  []
