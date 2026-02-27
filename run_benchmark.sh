@@ -6,7 +6,7 @@ RUNTIME_BUFFER_NS="${1:-0}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DAG_SET_DIR="${SCRIPT_DIR}/ActualDAGSet"
 LAUNCH_FILE="ros2_task_set dummy_node.launch.xml"
-DURATION=60
+DURATION=5
 RESULT_DIR="${SCRIPT_DIR}/benchmark_results"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 RESULT_FILE="${RESULT_DIR}/results_${TIMESTAMP}.txt"
@@ -49,7 +49,7 @@ for tu_dir in "${DAG_SET_DIR}"/TU_*; do
 		if [[ -f "${cie_yaml}" ]]; then
 			# Add runtime buffer to each runtime value in the CIE config
 			cie_yaml_modified="$(mktemp --suffix=.yaml)"
-			awk -v buf="${RUNTIME_BUFFER_NS}" '/^[[:space:]]*runtime: [0-9]/ { match($0, /^([[:space:]]*runtime: )/, m); print m[1] ($2 + buf); next } { print }' "${cie_yaml}" >"${cie_yaml_modified}"
+			awk -v buf="${RUNTIME_BUFFER_NS}" '/^[[:space:]]*runtime: [0-9]/ { match($0, /^[[:space:]]*runtime: /); print substr($0, 1, RLENGTH) ($2 + buf); next } { print }' "${cie_yaml}" >"${cie_yaml_modified}"
 			setsid ros2 run agnocast_cie_thread_configurator thread_configurator_node --config-file "${cie_yaml_modified}" >"${configurator_output}" 2>&1 &
 			configurator_pid=$!
 		else
