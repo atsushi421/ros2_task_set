@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eo pipefail
 
+RUNTIME_BUFFER_NS="${1:-0}"
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DAG_SET_DIR="${SCRIPT_DIR}/ActualDAGSet"
 LAUNCH_FILE="ros2_task_set dummy_node.launch.xml"
@@ -18,6 +20,7 @@ mkdir -p "${RESULT_DIR}"
 
 echo "=== Benchmark started at $(date) ===" | tee "${RESULT_FILE}"
 echo "Duration per case: ${DURATION}s" | tee -a "${RESULT_FILE}"
+echo "Runtime buffer: ${RUNTIME_BUFFER_NS} ns" | tee -a "${RESULT_FILE}"
 echo "" | tee -a "${RESULT_FILE}"
 
 for tu_dir in "${DAG_SET_DIR}"/TU_*; do
@@ -26,8 +29,10 @@ for tu_dir in "${DAG_SET_DIR}"/TU_*; do
 	echo " ${tu_name}" | tee -a "${RESULT_FILE}"
 	echo "========================================" | tee -a "${RESULT_FILE}"
 
-	for yaml_file in "${tu_dir}"/*.yaml; do
+	for yaml_file in "${tu_dir}"/case_*.yaml; do
 		case_name="$(basename "${yaml_file}" .yaml)"
+		# Skip taskset config files
+		[[ "${case_name}" == *_taskset ]] && continue
 		echo "--- ${tu_name}/${case_name} ---" | tee -a "${RESULT_FILE}"
 
 		# Copy YAML to working directory as dags.yaml
@@ -39,8 +44,13 @@ for tu_dir in "${DAG_SET_DIR}"/TU_*; do
 		# Start thread configurator with corresponding CIE config
 		cie_yaml="${tu_dir}/cie_${case_name}.yaml"
 		configurator_pid=""
+		configurator_output="$(mktemp)"
+		cie_yaml_modified=""
 		if [[ -f "${cie_yaml}" ]]; then
-			ros2 run agnocast_cie_thread_configurator thread_configurator_node --config-file "${cie_yaml}" &
+			# Add runtime buffer to each runtime value in the CIE config
+			cie_yaml_modified="$(mktemp --suffix=.yaml)"
+			awk -v buf="${RUNTIME_BUFFER_NS}" '/^[[:space:]]*runtime: [0-9]/ { match($0, /^([[:space:]]*runtime: )/, m); print m[1] ($2 + buf); next } { print }' "${cie_yaml}" >"${cie_yaml_modified}"
+			setsid ros2 run agnocast_cie_thread_configurator thread_configurator_node --config-file "${cie_yaml_modified}" >"${configurator_output}" 2>&1 &
 			configurator_pid=$!
 		else
 			echo "  [WARN] CIE config not found: ${cie_yaml}" | tee -a "${RESULT_FILE}"
@@ -64,20 +74,42 @@ for tu_dir in "${DAG_SET_DIR}"/TU_*; do
 		}
 		wait "${launch_pid}" 2>/dev/null || true
 
-		# Stop thread configurator
+		# Stop thread configurator (kill entire process group)
 		if [[ -n "${configurator_pid}" ]]; then
-			kill "${configurator_pid}" 2>/dev/null || true
+			kill -INT -- "-${configurator_pid}" 2>/dev/null || true
+			timeout 10 tail --pid="${configurator_pid}" -f /dev/null 2>/dev/null || {
+				kill -9 -- "-${configurator_pid}" 2>/dev/null || true
+			}
 			wait "${configurator_pid}" 2>/dev/null || true
 		fi
 
-		# Extract and record Response Time Statistics
-		if grep -q "Response Time Statistics" "${output_file}"; then
-			sed -n '/=== Response Time Statistics ===/,$ p' "${output_file}" | tee -a "${RESULT_FILE}"
-		else
-			echo "  [WARN] No Response Time Statistics found" | tee -a "${RESULT_FILE}"
+		# Check for SCHED_DEADLINE failure
+		sched_failed=false
+		if grep -q "Failed to apply SCHED_DEADLINE\|Failed to configure policy" "${configurator_output}"; then
+			sched_failed=true
+			echo "  失敗:" | tee -a "${RESULT_FILE}"
+			grep "Failed to apply SCHED_DEADLINE\|Failed to configure policy" "${configurator_output}" | \
+				sed 's/.*\(Failed to apply SCHED_DEADLINE.*\)/    \1/; s/.*\(Failed to configure policy.*\)/    \1/' | \
+				tee -a "${RESULT_FILE}"
 		fi
 
-		rm -f "${output_file}"
+		# Copy response time CSVs to result directory (skip if SCHED_DEADLINE failed)
+		if [[ "${sched_failed}" == false ]]; then
+			case_result_dir="${RESULT_DIR}/${TIMESTAMP}/${tu_name}/${case_name}"
+			rt_csvs=("${SCRIPT_DIR}"/exec_time_logs/response_time_task*.csv)
+			if [[ -e "${rt_csvs[0]}" ]]; then
+				mkdir -p "${case_result_dir}"
+				cp "${SCRIPT_DIR}"/exec_time_logs/response_time_task*.csv "${case_result_dir}/"
+				echo "  Response time CSVs saved to ${case_result_dir}/" | tee -a "${RESULT_FILE}"
+				for rt_csv in "${case_result_dir}"/response_time_task*.csv; do
+					echo "    $(basename "${rt_csv}"): $(( $(wc -l < "${rt_csv}") - 1 )) samples" | tee -a "${RESULT_FILE}"
+				done
+			else
+				echo "  [WARN] No response time CSVs found" | tee -a "${RESULT_FILE}"
+			fi
+		fi
+
+		rm -f "${output_file}" "${configurator_output}" "${cie_yaml_modified}"
 		echo "" | tee -a "${RESULT_FILE}"
 	done
 done

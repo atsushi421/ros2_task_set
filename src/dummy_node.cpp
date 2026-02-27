@@ -328,7 +328,6 @@ private:
       return;
     }
 
-    std::cerr << "\n=== Response Time Statistics ===" << std::endl;
     for (const auto & [cb_id, deadline] : deadline_ms_) {
       auto it = response_times_.find(cb_id);
       if (it == response_times_.end() || it->second.empty()) {
@@ -338,39 +337,19 @@ private:
       }
 
       const auto & rts = it->second;
-      size_t count = rts.size();
 
-      double sum = std::accumulate(rts.begin(), rts.end(), 0.0);
-      double mean = sum / count;
-
-      int64_t min_val = *std::min_element(rts.begin(), rts.end());
-      int64_t max_val = *std::max_element(rts.begin(), rts.end());
-
-      double sq_sum = 0.0;
-      for (int64_t v : rts) {
-        double diff = v - mean;
-        sq_sum += diff * diff;
-      }
-      double stddev = std::sqrt(sq_sum / count);
-
+      // Write all response times to CSV
+      std::string csv_path =
+        EXEC_TIME_LOGS_DIR + "/response_time_task" + std::to_string(cb_id) + ".csv";
+      std::ofstream csv(csv_path);
+      csv << "index,response_time_us,deadline_us" << std::endl;
       int64_t deadline_us = static_cast<int64_t>(deadline) * 1000;
-      size_t miss_count = 0;
-      for (int64_t v : rts) {
-        if (v > deadline_us) {
-          ++miss_count;
-        }
+      for (size_t i = 0; i < rts.size(); ++i) {
+        csv << i << "," << rts[i] << "," << deadline_us << std::endl;
       }
-
-      std::cerr << "Task " << cb_id << " (deadline: " << deadline << " ms):" << std::endl;
-      std::cerr << "  count:  " << count << std::endl;
-      std::cerr << "  mean:   " << std::fixed << std::setprecision(1) << mean / 1000.0
-                << " ms" << std::endl;
-      std::cerr << "  min:    " << min_val / 1000.0 << " ms" << std::endl;
-      std::cerr << "  max:    " << max_val / 1000.0 << " ms" << std::endl;
-      std::cerr << "  stddev: " << stddev / 1000.0 << " ms" << std::endl;
-      std::cerr << "  deadline misses: " << miss_count << " / " << count << " ("
-                << std::fixed << std::setprecision(1)
-                << (100.0 * miss_count / count) << "%)" << std::endl;
+      csv.close();
+      std::cerr << "Task " << cb_id << ": wrote " << rts.size() << " response times to "
+                << csv_path << std::endl;
     }
   }
 
