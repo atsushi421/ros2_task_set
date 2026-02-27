@@ -6,7 +6,7 @@ RUNTIME_BUFFER_NS="${1:-0}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DAG_SET_DIR="${SCRIPT_DIR}/ActualDAGSet"
 LAUNCH_FILE="ros2_task_set dummy_node.launch.xml"
-DURATION=5
+DURATION=60
 RESULT_DIR="${SCRIPT_DIR}/benchmark_results"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 RESULT_FILE="${RESULT_DIR}/results_${TIMESTAMP}.txt"
@@ -88,8 +88,8 @@ for tu_dir in "${DAG_SET_DIR}"/TU_*; do
 		if grep -q "Failed to apply SCHED_DEADLINE\|Failed to configure policy" "${configurator_output}"; then
 			sched_failed=true
 			echo "  失敗:" | tee -a "${RESULT_FILE}"
-			grep "Failed to apply SCHED_DEADLINE\|Failed to configure policy" "${configurator_output}" | \
-				sed 's/.*\(Failed to apply SCHED_DEADLINE.*\)/    \1/; s/.*\(Failed to configure policy.*\)/    \1/' | \
+			grep "Failed to apply SCHED_DEADLINE\|Failed to configure policy" "${configurator_output}" |
+				sed 's/.*\(Failed to apply SCHED_DEADLINE.*\)/    \1/; s/.*\(Failed to configure policy.*\)/    \1/' |
 				tee -a "${RESULT_FILE}"
 		fi
 
@@ -102,7 +102,7 @@ for tu_dir in "${DAG_SET_DIR}"/TU_*; do
 				cp "${SCRIPT_DIR}"/exec_time_logs/response_time_task*.csv "${case_result_dir}/"
 				echo "  Response time CSVs saved to ${case_result_dir}/" | tee -a "${RESULT_FILE}"
 				for rt_csv in "${case_result_dir}"/response_time_task*.csv; do
-					echo "    $(basename "${rt_csv}"): $(( $(wc -l < "${rt_csv}") - 1 )) samples" | tee -a "${RESULT_FILE}"
+					echo "    $(basename "${rt_csv}"): $(($(wc -l <"${rt_csv}") - 1)) samples" | tee -a "${RESULT_FILE}"
 				done
 			else
 				echo "  [WARN] No response time CSVs found" | tee -a "${RESULT_FILE}"
