@@ -4,9 +4,9 @@ set -eo pipefail
 RUNTIME_BUFFER_NS="${1:-0}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-DAG_SET_DIR="${SCRIPT_DIR}/ActualDAGSet"
+DAG_SET_DIR="${DAG_SET_DIR:-${SCRIPT_DIR}/ActualDAGSet}"
 LAUNCH_FILE="ros2_task_set dummy_node.launch.xml"
-DURATION=5
+DURATION=60
 RESULT_DIR="${SCRIPT_DIR}/benchmark_results"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 RESULT_FILE="${RESULT_DIR}/results_${TIMESTAMP}.txt"

@@ -1,0 +1,50 @@
+=== Benchmark started at Fri Feb 27 01:01:20 PM JST 2026 ===
+Duration per case: 60s
+Runtime buffer: 500000 ns
+
+========================================
+ TU_1.0
+========================================
+--- TU_1.0/case_1 ---
+  Response time CSVs saved to /home/atsushi/ros2_task_set/benchmark_results/20260227_130120/TU_1.0/case_1/
+    response_time_task10.csv: 584 samples
+    response_time_task21.csv: 580 samples
+    response_time_task31.csv: 587 samples
+
+========================================
+ TU_1.5
+========================================
+--- TU_1.5/case_2 ---
+  Response time CSVs saved to /home/atsushi/ros2_task_set/benchmark_results/20260227_130120/TU_1.5/case_2/
+    response_time_task10.csv: 588 samples
+    response_time_task12.csv: 585 samples
+    response_time_task17.csv: 589 samples
+
+========================================
+ TU_2.0
+========================================
+--- TU_2.0/case_3 ---
+  Response time CSVs saved to /home/atsushi/ros2_task_set/benchmark_results/20260227_130120/TU_2.0/case_3/
+    response_time_task10.csv: 550 samples
+    response_time_task21.csv: 561 samples
+    response_time_task23.csv: 493 samples
+
+========================================
+ TU_2.5
+========================================
+--- TU_2.5/case_4 ---
+  Response time CSVs saved to /home/atsushi/ros2_task_set/benchmark_results/20260227_130120/TU_2.5/case_4/
+    response_time_task10.csv: 490 samples
+    response_time_task15.csv: 241 samples
+    response_time_task26.csv: 522 samples
+
+========================================
+ TU_3.0
+========================================
+--- TU_3.0/case_5 ---
+  Response time CSVs saved to /home/atsushi/ros2_task_set/benchmark_results/20260227_130120/TU_3.0/case_5/
+    response_time_task10.csv: 288 samples
+    response_time_task17.csv: 416 samples
+    response_time_task22.csv: 106 samples
+
+=== Benchmark finished at Fri Feb 27 01:06:31 PM JST 2026 ===
