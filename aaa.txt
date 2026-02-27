@@ -1,0 +1,10 @@
+$ bash run_benchmark.sh 500000
+=== Benchmark started at 2026年  2月 27日 金曜日 11:38:46 JST ===
+Duration per case: 60s
+Runtime buffer: 500000 ns
+
+========================================
+ TU_1.0
+========================================
+--- TU_1.0/case_1 ---
+awk: line 1: syntax error at or near ,
